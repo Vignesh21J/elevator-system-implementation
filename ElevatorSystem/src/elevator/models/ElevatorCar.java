@@ -115,13 +115,13 @@ public final class ElevatorCar {
     }
 
     public void moveOneFloor() {
-        if (direction == Direction.IDLE) {
+        if (getDirection() == Direction.IDLE) {
             return;
         }
 
-        if (direction == Direction.UP) {
+        if (getDirection() == Direction.UP) {
             currentFloor++;
-        } else if (direction == Direction.DOWN) {
+        } else if (getDirection() == Direction.DOWN) {
             currentFloor--;
         }
     }
