@@ -1,0 +1,11 @@
+### IntelliJ IDEA ###
+.idea/
+*.iml
+out/
+
+### Java ###
+*.class
+*.log
+
+### OS ###
+.DS_Store
