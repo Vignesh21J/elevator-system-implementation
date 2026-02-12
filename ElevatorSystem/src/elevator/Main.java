@@ -11,50 +11,35 @@ public class Main {
 
     public static void main(String[] args) {
 
-        System.out.println("\n===== Simulation Test =====");
+        System.out.println("\n===== Multi-Elevator Test =====");
 
-        List<ElevatorCar> elevators = List.of(
-                new ElevatorCar(1, 0),
-                new ElevatorCar(2, 4)
-        );
+        ElevatorSystem system = new ElevatorSystem(0, 9, 2, new NearestCarStrategy());
 
-        ElevatorSystem system =
-                new ElevatorSystem(elevators, new NearestCarStrategy());
+        system.requestPickUp(3, Direction.UP);
+        system.requestPickUp(9, Direction.DOWN);
 
+        // Invalid testcases (will be rejected)
+        system.requestPickUp(9, Direction.UP);
+        system.requestPickUp(0, Direction.DOWN);
+        system.requestPickUp(15, Direction.UP);
 
-        System.out.println("\n---------- Simulation Start ----------");
+        System.out.println("---------- Simulation Start ----------");
 
-        for (int tick = 0; tick < 25; tick++) {
+        for (int tick = 0; tick < 20; tick++) {
 
-            // External Hall Requests
-            if (tick == 0) {
-                system.requestPickUp(3, Direction.UP);
-            }
-
-            if (tick == 1) {
-                system.requestPickUp(6, Direction.DOWN);
-            }
-
-            if (tick == 5) {
-                system.requestPickUp(1, Direction.UP);
-            }
-
-            // Internal Cabin Requests
             if (tick == 3) {
-                system.requestDropOff(1, 8);
+                system.requestDropOff(1, 7);
             }
 
-            if (tick == 7) {
-                system.requestDropOff(2, 0);
+            if (tick == 6) {
+                system.requestDropOff(2, 3);
             }
-
-            System.out.println("\nTICK: " + tick);
 
             system.step();
 
-            for (ElevatorCar e : elevators) {
+            for (ElevatorCar e : system.getElevators()) {
                 System.out.println(
-                                "Elevator " + e.getId() +
+                        "Elevator " + e.getId() +
                                 " | Floor: " + e.getCurrentFloor() +
                                 " | Direction: " + e.getDirection() +
                                 " | State: " + e.getState() +
