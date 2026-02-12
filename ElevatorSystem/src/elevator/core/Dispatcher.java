@@ -23,6 +23,8 @@ public final class Dispatcher {
 
         if (selected != null) {
             selected.addTarget(floor);
+            System.out.println("Assigned floor " + request.getFloor() +
+                    " to Elevator ID: " + selected.getId());
         }
     }
 }

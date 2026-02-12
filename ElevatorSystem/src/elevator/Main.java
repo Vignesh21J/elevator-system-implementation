@@ -11,53 +11,35 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
 
-        System.out.println("===== TEST 1: UP Movement =====");
-        testUpMovement();
+        System.out.println("===== Multiple Elevator Testing =====");
 
-        System.out.println("\n===== TEST 2: DOWN Movement =====");
-        testDownMovement();
-    }
-
-    private static void testUpMovement() {
-        ElevatorCar elevator = new ElevatorCar(1, 0);  // A single Elevator
-
-        List<ElevatorCar> elevators = List.of(elevator);  // 1 Elevator as List
+        List<ElevatorCar> elevators = List.of(
+                new ElevatorCar(1, 0),
+                new ElevatorCar(2, 8),
+                new ElevatorCar(3, 1)
+        );
 
         ElevatorSystem elevatorSystem = new ElevatorSystem(
                 elevators, new NearestCarStrategy());
 
         elevatorSystem.requestPickUp(4, Direction.UP);
-        elevatorSystem.requestPickUp(7, Direction.UP);
+        elevatorSystem.requestPickUp(5, Direction.UP);
 
-        for (int i = 0; i < 10; i++) {
+        System.out.println("----------");
+
+        for (int i = 0; i < 20; i++) {
             elevatorSystem.step();
-            System.out.println("Floor: " + elevator.getCurrentFloor()
-                    + " | Direction: " + elevator.getDirection()
-                    + " | State: " + elevator.getState()
-                    + " | Fan: " + elevator.getFanState()
-            );
-        }
-    }
 
-    private static void testDownMovement() {
-        ElevatorCar elevator = new ElevatorCar(1, 7);  // A single Elevator
-
-        List<ElevatorCar> elevators = List.of(elevator);  // 1 Elevator as List
-
-        ElevatorSystem elevatorSystem = new ElevatorSystem(
-                elevators, new NearestCarStrategy());
-
-        elevatorSystem.requestPickUp(1, Direction.DOWN);
-        elevatorSystem.requestPickUp(3, Direction.DOWN);
-
-
-        for (int i = 0; i < 10; i++) {
-            elevatorSystem.step();
-            System.out.println("Floor: " + elevator.getCurrentFloor()
-                    + " | Direction: " + elevator.getDirection()
-                    + " | State: " + elevator.getState()
-                    + " | Fan: " + elevator.getFanState()
-            );
+            for (ElevatorCar e : elevators) {
+                System.out.println(
+                        "Elevator " + e.getId() +
+                        " | Floor: " + e.getCurrentFloor()
+                        + " | Direction: " + e.getDirection()
+                        + " | State: " + e.getState()
+                        + " | Fan Turned: " + e.getFanState()
+                );
+            }
+            System.out.println("----------");
         }
     }
 }
