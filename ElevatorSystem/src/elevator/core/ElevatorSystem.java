@@ -7,7 +7,10 @@ import elevator.strategy.SchedulingStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+
+import elevator.exceptions.InvalidFloorException;
+import elevator.exceptions.InvalidDirectionException;
+import elevator.exceptions.ElevatorNotFoundException;
 
 public final class ElevatorSystem {
 
@@ -39,15 +42,8 @@ public final class ElevatorSystem {
 
     public void requestPickUp(int floor, Direction direction) {
 
-        if (!isValidFloor(floor)) {
-            System.out.println("Invalid floor: " + floor);
-            return;
-        }
-
-        if (!isValidHallDirection(floor, direction)) {
-            System.out.println("Invalid direction at floor " + floor);
-            return;
-        }
+        validateFloor(floor);
+        validateHallDirection(floor, direction);
 
         HallRequest request = new HallRequest(floor, direction);
         dispatcher.onHallRequest(request, elevators);
@@ -56,17 +52,9 @@ public final class ElevatorSystem {
     // New Cabin Request for Drop off
     public void requestDropOff(int elevatorId, int destFloor) {
 
-        if (!isValidFloor(destFloor)) {
-            System.out.println("Invalid drop-off floor: " + destFloor);
-            return;
-        }
+        validateFloor(destFloor);
 
         ElevatorCar car = getElevatorById(elevatorId);
-
-        if (car == null) {
-            System.out.println("Invalid elevator ID: " + elevatorId);
-            return;
-        }
 
         car.addStop(destFloor);
 
@@ -105,24 +93,27 @@ public final class ElevatorSystem {
     }
 
 
-
-    private boolean isValidFloor(int floor) {
-        return floor >= minFloor && floor <= maxFloor;
+    private void validateFloor(int floor) {
+        if (floor < minFloor || floor > maxFloor) {
+            throw new InvalidFloorException(floor, minFloor, maxFloor);
+        }
     }
 
-    private boolean isValidHallDirection(int floor, Direction direction) {
+    private void validateHallDirection(int floor, Direction direction) {
 
-        if (direction == Direction.IDLE)
-            return false;
+        if (direction == Direction.IDLE) {
+            throw new InvalidDirectionException(direction, "Hall Request");
+        }
 
-        if (floor == minFloor && direction == Direction.DOWN)
-            return false;
+        if (floor == minFloor && direction == Direction.DOWN) {
+            throw new InvalidDirectionException(direction, "Hall Request at min floor");
+        }
 
-        if (floor == maxFloor && direction == Direction.UP)
-            return false;
-
-        return true;
+        if (floor == maxFloor && direction == Direction.UP) {
+            throw new InvalidDirectionException(direction, "Hall Request at max floor");
+        }
     }
+
 
 
     private ElevatorCar getElevatorById(int id) {
@@ -131,7 +122,7 @@ public final class ElevatorSystem {
                 return car;
             }
         }
-        return null;
+        throw new ElevatorNotFoundException(id, elevators.size());
     }
 
     public List<ElevatorCar> getElevators() {
