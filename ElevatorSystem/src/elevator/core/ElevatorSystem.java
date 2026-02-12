@@ -82,6 +82,29 @@ public final class ElevatorSystem {
         }
     }
 
+    public void run(int ticks) {
+
+        for (int t = 1; t <= ticks; t++) {
+
+            step();
+
+            System.out.println("Tick " + t);
+
+            for (ElevatorCar car : elevators) {
+                System.out.println("  Elevator "
+                        + car.getId()
+                        + " | Floor: " + car.getCurrentFloor()
+                        + " | Direction: " + car.getDirection()
+                        + " | State: " + car.getState()
+                        + " | Door: " + car.getDoorState()
+                        + " | Fan: " + car.getFanState());
+            }
+
+            System.out.println("--------------------------------------");
+        }
+    }
+
+
 
     private boolean isValidFloor(int floor) {
         return floor >= minFloor && floor <= maxFloor;

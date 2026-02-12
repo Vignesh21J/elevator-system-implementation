@@ -2,53 +2,38 @@ package elevator;
 
 import elevator.core.ElevatorSystem;
 import elevator.enums.Direction;
-import elevator.models.ElevatorCar;
 import elevator.strategy.NearestCarStrategy;
-
-import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        System.out.println("\n===== Multi-Elevator Test =====");
+        System.out.println("=== Multi-Elevator Tick-Based Simulation ===\n");
 
-        ElevatorSystem system = new ElevatorSystem(0, 9, 2, new NearestCarStrategy());
+        ElevatorSystem system =
+                new ElevatorSystem(0, 9, 2, new NearestCarStrategy());
 
+        // ---------------- PHASE 1 ----------------
+        System.out.println("PHASE 1: Initial Hall Request");
         system.requestPickUp(3, Direction.UP);
-        system.requestPickUp(9, Direction.DOWN);
+        system.run(2);
 
-        // Invalid testcases (will be rejected)
-        system.requestPickUp(9, Direction.UP);
-        system.requestPickUp(0, Direction.DOWN);
-        system.requestPickUp(15, Direction.UP);
+        // ---------------- PHASE 2 ----------------
+        System.out.println("\nPHASE 2: Another Hall Request While Moving");
+        system.requestPickUp(8, Direction.DOWN);
+        system.run(3);
 
-        System.out.println("---------- Simulation Start ----------");
+        // ---------------- PHASE 3 ----------------
+        System.out.println("\nPHASE 3: Cabin Requests During Movement");
+        system.requestDropOff(1, 7);
+        system.requestDropOff(2, 2);
+        system.run(5);
 
-        for (int tick = 0; tick < 20; tick++) {
+        // ---------------- PHASE 4 ----------------
+        System.out.println("\nPHASE 4: New Hall Request Mid-Simulation");
+        system.requestPickUp(5, Direction.UP);
+        system.run(9);
 
-            if (tick == 3) {
-                system.requestDropOff(1, 7);
-            }
-
-            if (tick == 6) {
-                system.requestDropOff(2, 3);
-            }
-
-            system.step();
-
-            for (ElevatorCar e : system.getElevators()) {
-                System.out.println(
-                        "Elevator " + e.getId() +
-                                " | Floor: " + e.getCurrentFloor() +
-                                " | Direction: " + e.getDirection() +
-                                " | State: " + e.getState() +
-                                " | Door: " + e.getDoorState() +
-                                " | Fan: " + e.getFanState()
-                );
-            }
-
-            System.out.println("--------------------------------------");
-        }
+        System.out.println("\n=== Simulation Complete ===");
     }
 }
