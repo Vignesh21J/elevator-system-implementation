@@ -10,20 +10,20 @@ import java.util.List;
 public final class NearestCarStrategy implements SchedulingStrategy {
 
     @Override
-    public ElevatorCar chooseElevator(HallRequest req, List<ElevatorCar> elevators) {
+    public int chooseElevator(HallRequest req, List<ElevatorCar> elevators) {
 
-        ElevatorCar best = null;
+        int bestId = -1;
         long bestScore = Long.MAX_VALUE;
 
         for (ElevatorCar car : elevators) {
             long score = getScoreForCar(car, req);
 
-            if (score < bestScore || (score == bestScore && best != null && car.getId() < best.getId())) {
+            if (score < bestScore || (score == bestScore && car.getId() < bestId)) {
                 bestScore = score;
-                best = car;
+                bestId = car.getId();
             }
         }
-        return best;
+        return bestId;
     }
 
     private long getScoreForCar(ElevatorCar car, HallRequest req) {

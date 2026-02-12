@@ -27,8 +27,16 @@ public final class Dispatcher {
         while (iterator.hasNext()) {
             HallRequest request = iterator.next().getValue();
 
-            ElevatorCar chosen =
-                    strategy.chooseElevator(request, elevators);
+            int chosenId = strategy.chooseElevator(request, elevators);
+
+            ElevatorCar chosen = null;
+
+            for (ElevatorCar car : elevators) {
+                if (car.getId() == chosenId) {
+                    chosen = car;
+                    break;
+                }
+            }
 
             if (chosen == null) {
                 continue;

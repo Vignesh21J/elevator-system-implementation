@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface SchedulingStrategy {
 
-    public ElevatorCar chooseElevator(HallRequest req, List<ElevatorCar> elevators);
+    public int chooseElevator(HallRequest req, List<ElevatorCar> elevators);
 }

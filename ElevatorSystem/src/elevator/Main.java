@@ -11,34 +11,50 @@ public class Main {
 
     public static void main(String[] args) {
 
-        System.out.println();
-        System.out.println("===== Multi Elevator Test =====");
+        System.out.println("\n===== Simulation Test =====");
 
         List<ElevatorCar> elevators = List.of(
                 new ElevatorCar(1, 0),
-                new ElevatorCar(2, 8)
+                new ElevatorCar(2, 4)
         );
 
-        ElevatorSystem coreSystem =
+        ElevatorSystem system =
                 new ElevatorSystem(elevators, new NearestCarStrategy());
 
-        coreSystem.requestPickUp(3, Direction.UP);
-        coreSystem.requestPickUp(2, Direction.DOWN);
-        coreSystem.requestPickUp(9, Direction.DOWN);
 
-        System.out.println();
+        System.out.println("\n---------- Simulation Start ----------");
 
-        System.out.println("---------- Simulation Start ----------");
+        for (int tick = 0; tick < 25; tick++) {
 
-        for (int tick = 0; tick < 20; tick++) {
+            // External Hall Requests
+            if (tick == 0) {
+                system.requestPickUp(3, Direction.UP);
+            }
 
-            System.out.println("TICK: " + tick);
+            if (tick == 1) {
+                system.requestPickUp(6, Direction.DOWN);
+            }
 
-            coreSystem.step();
+            if (tick == 5) {
+                system.requestPickUp(1, Direction.UP);
+            }
+
+            // Internal Cabin Requests
+            if (tick == 3) {
+                system.requestDropOff(1, 8);
+            }
+
+            if (tick == 7) {
+                system.requestDropOff(2, 0);
+            }
+
+            System.out.println("\nTICK: " + tick);
+
+            system.step();
 
             for (ElevatorCar e : elevators) {
                 System.out.println(
-                        "Elevator " + e.getId() +
+                                "Elevator " + e.getId() +
                                 " | Floor: " + e.getCurrentFloor() +
                                 " | Direction: " + e.getDirection() +
                                 " | State: " + e.getState() +
