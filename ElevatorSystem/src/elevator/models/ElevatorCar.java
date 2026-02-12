@@ -141,11 +141,13 @@ public final class ElevatorCar {
         if (target == null) {
             direction = Direction.IDLE;
             state = ElevatorState.IDLE;
+            fan.turnOff();  // auto turn off fan when elevator is in Idle
             return;
         }
 
         state = ElevatorState.MOVING;
 
+        fan.turnOn();
         moveOneFloor();
 
         if (shouldStopAtCurrentFloor()) {

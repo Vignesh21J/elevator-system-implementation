@@ -39,6 +39,7 @@ public class Main {
             System.out.println("Floor: " + elevator.getCurrentFloor()
                     + " | Direction: " + elevator.getDirection()
                     + " | State: " + elevator.getState()
+                    + " | Fan: " + elevator.getFanState()
             );
         }
     }
@@ -54,6 +55,7 @@ public class Main {
             System.out.println("Floor: " + elevator.getCurrentFloor()
                     + " | Direction: " + elevator.getDirection()
                     + " | State: " + elevator.getState()
+                    + " | Fan: " + elevator.getFanState()
             );
         }
     }
