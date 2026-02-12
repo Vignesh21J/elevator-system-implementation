@@ -5,26 +5,41 @@ import elevator.models.ElevatorCar;
 import elevator.models.HallRequest;
 import elevator.strategy.SchedulingStrategy;
 
-import java.util.List;
+import java.util.*;
 
 public final class Dispatcher {
-    private final List<ElevatorCar> elevators;
-    private final SchedulingStrategy strategy;
 
-    public Dispatcher(List<ElevatorCar> elevators, SchedulingStrategy strategy) {
-        this.elevators = elevators;
+    private final SchedulingStrategy strategy;
+    private final Map<UUID, HallRequest> pendingRequests = new LinkedHashMap<>();
+
+    public Dispatcher(SchedulingStrategy strategy) {
         this.strategy = strategy;
     }
 
-    public void onHallRequest(int floor, Direction direction) {
-        HallRequest request = new HallRequest(floor, direction);
+    public void onHallRequest(HallRequest req, List<ElevatorCar> elevators) {
+        pendingRequests.put(req.getId(),req);
+        tryAssignAll(elevators);
+    }
 
-        ElevatorCar selected = strategy.chooseElevator(request, elevators);
+    public void tryAssignAll(List<ElevatorCar> elevators) {
+        Iterator<Map.Entry<UUID, HallRequest>> iterator = pendingRequests.entrySet().iterator();
 
-        if (selected != null) {
-            selected.addTarget(floor);
-            System.out.println("Assigned floor " + request.getFloor() +
-                    " to Elevator ID: " + selected.getId());
+        while (iterator.hasNext()) {
+            HallRequest request = iterator.next().getValue();
+
+            ElevatorCar chosen =
+                    strategy.chooseElevator(request, elevators);
+
+            if (chosen == null) {
+                continue;
+            }
+
+            chosen.addStop(request.getFloor());
+
+            System.out.println("Assigned request at floor " + request.getFloor()
+                    + " to Elevator : " + chosen.getId());
+
+            iterator.remove();
         }
     }
 }

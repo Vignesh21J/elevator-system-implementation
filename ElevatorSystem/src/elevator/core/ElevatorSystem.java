@@ -2,6 +2,7 @@ package elevator.core;
 
 import elevator.enums.Direction;
 import elevator.models.ElevatorCar;
+import elevator.models.HallRequest;
 import elevator.strategy.SchedulingStrategy;
 
 import java.util.List;
@@ -12,14 +13,18 @@ public final class ElevatorSystem {
 
     public ElevatorSystem(List<ElevatorCar> elevators, SchedulingStrategy strategy) {
         this.elevators = elevators;
-        this.dispatcher = new Dispatcher(elevators, strategy);
+        this.dispatcher = new Dispatcher(strategy);
     }
 
     public void requestPickUp(int floor, Direction direction) {
-        dispatcher.onHallRequest(floor, direction);
+        HallRequest request = new HallRequest(floor, direction);
+        dispatcher.onHallRequest(request, elevators);
     }
 
     public void step() {
+
+        dispatcher.tryAssignAll(elevators);  // try assigning pending requests
+
         for (ElevatorCar elevator : elevators) {
             elevator.step();
         }

@@ -1,5 +1,6 @@
 package elevator.models;
 
+import elevator.Main;
 import elevator.enums.Direction;
 import elevator.enums.DoorState;
 import elevator.enums.ElevatorState;
@@ -42,126 +43,130 @@ public final class ElevatorCar {
         return state;
     }
 
-    public void openDoor() {
-        if (state == ElevatorState.MOVING) {
-            throw new IllegalStateException("Cannot open door while elevator is moving.");
-        }
-        door.openDoor();
-        state = ElevatorState.DOOR_OPEN;
-    }
-
-    public void closeDoor() {
-        door.closeDoor();
-    }
-
     public DoorState getDoorState() {
         return door.getState();
-    }
-
-    public void turnFanOn() {
-        fan.turnOn();
-    }
-
-    public void turnFanOff() {
-        fan.turnOff();
     }
 
     public FanState getFanState() {
         return fan.getState();
     }
 
-    public void addTarget(int floor) {
-        if (floor == getCurrentFloor()) {
+
+    public boolean hasStops() {
+        return !upStops.isEmpty() || !downStops.isEmpty();
+    }
+
+    public void addStop(int floor) {
+        if (floor == currentFloor) {
+            upStops.add(floor);  // Insert floor here to trigger stop logic in next tick
             return;
         }
 
-        if (floor > getCurrentFloor()) {
+        if (floor > currentFloor)
             upStops.add(floor);
-        } else {
+        else
             downStops.add(floor);
-        }
-    }
-
-    public Integer nextStop() {
-        if (getDirection() == Direction.UP) {
-            if (!upStops.isEmpty()) {
-                return upStops.first();
-            } else if (!downStops.isEmpty()) {
-                direction = Direction.DOWN;
-                return downStops.last();
-            }
-        }
-
-        if (getDirection() == Direction.DOWN) {
-            if (!downStops.isEmpty()) {
-                return downStops.last();
-            } else if (!upStops.isEmpty()) {
-                direction = Direction.UP;
-                return upStops.first();
-            }
-        }
-
-        if (getDirection() == Direction.IDLE) {
-            if (!upStops.isEmpty()) {
-                direction = Direction.UP;
-                return upStops.first();
-            } else if (!downStops.isEmpty()) {
-                direction = Direction.DOWN;
-                return downStops.last();
-            }
-        }
-
-        return null; // no stops in both sets.
-    }
-
-    public void moveOneFloor() {
-        if (getDirection() == Direction.IDLE) {
-            return;
-        }
-
-        if (getDirection() == Direction.UP) {
-            currentFloor++;
-        } else if (getDirection() == Direction.DOWN) {
-            currentFloor--;
-        }
-    }
-
-    public boolean shouldStopAtCurrentFloor() {
-        return upStops.contains(currentFloor) || downStops.contains(currentFloor);
-    }
-
-    public void removeStopAtCurrentFloor() {
-        upStops.remove(currentFloor);
-        downStops.remove(currentFloor);
     }
 
     public void step() {
-        Integer target = nextStop();
+        // If door is open, close it first.
+        if (state == ElevatorState.DOOR_OPEN) {
+            closeDoor();
 
-        if (target == null) {
-            direction = Direction.IDLE;
-            state = ElevatorState.IDLE;
-            fan.turnOff();  // auto turn off fan when elevator is in Idle
+            if (!hasStops()) {
+                direction = Direction.IDLE;
+                state = ElevatorState.IDLE;
+                fan.turnOff();
+            } else {
+                state = ElevatorState.MOVING;
+            }
             return;
         }
 
-        state = ElevatorState.MOVING;
+        // If there's no stops left, then
+        if (!hasStops()) {
+            direction = Direction.IDLE;
+            state = ElevatorState.IDLE;
+            fan.turnOff();
+            return;
+        }
 
+        decideDirectionIfIdle();
+
+        state = ElevatorState.MOVING;
         fan.turnOn();
         moveOneFloor();
 
-        if (shouldStopAtCurrentFloor()) {
-
-            state = ElevatorState.DOOR_OPEN;
-
-            removeStopAtCurrentFloor();
-
-            state = ElevatorState.IDLE;
-
-            // Go idle ONLY if no pending requests
-            if (upStops.isEmpty() && downStops.isEmpty()) {
-                direction = Direction.IDLE;
-            }
+        // Check here we should stop or need to stop in this floor
+        if (shouldStopHere()) {
+            upStops.remove(currentFloor);
+            downStops.remove(currentFloor);
+            openDoor();
         }
     }
+
+    private void closeDoor() {
+        door.closeDoor();;
+    }
+
+    private void decideDirectionIfIdle() {
+        if (direction != Direction.IDLE) return;
+
+        Integer upCandidate = upStops.isEmpty() ? null : upStops.first();
+        Integer downCandidate = downStops.isEmpty() ? null : downStops.last();
+
+        if (upCandidate == null && downCandidate == null) {
+            direction = Direction.IDLE;
+            return;
+        }
+
+        if (upCandidate == null) {
+            direction = Direction.DOWN;
+            return;
+        }
+
+        if (downCandidate == null) {
+            direction = Direction.UP;
+            return;
+        }
+
+        // Both Sets having values, then where/whom to serve?
+        int distanceUp = Math.abs(upCandidate - currentFloor);
+        int distanceDown = Math.abs(downCandidate - currentFloor);
+
+        direction = (distanceUp <= distanceDown) ? Direction.UP : Direction.DOWN;
+    }
+
+    private void moveOneFloor() {
+        if (direction == Direction.UP)
+            currentFloor++;
+        else if (direction == Direction.DOWN)
+            currentFloor--;
+    }
+
+    private boolean shouldStopHere() {
+        return upStops.contains(currentFloor) || downStops.contains(currentFloor);
+    }
+
+    private void openDoor() {
+        door.openDoor();
+        state = ElevatorState.DOOR_OPEN;
+        fan.turnOn();
+
+        // SCAN-like Direction Switching Algorithm
+        if (direction == Direction.UP &&
+                upStops.tailSet(currentFloor + 1).isEmpty()
+                && !downStops.isEmpty()) {
+            direction = Direction.DOWN;
+        }
+        else if (direction == Direction.DOWN &&
+                    downStops.headSet(currentFloor).isEmpty()
+                    && !upStops.isEmpty()) {
+            direction = Direction.UP;
+        }
+        else if (!hasStops()) {
+            direction = Direction.IDLE;
+        }
+    }
+
 }
