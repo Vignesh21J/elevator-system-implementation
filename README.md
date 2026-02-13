@@ -134,6 +134,18 @@ interface SchedulingStrategy {
 }
 ```
 
+## 📐 Architecture Diagrams
+
+## 🏗 UML Class Diagram
+
+![Elevator UML](./docs/elevator-system-uml.png)
+
+## 🔄 Sequence Diagram – Hall Request Flow
+![Sequence](./docs/sequence-diagram.png)
+
+## 🔁 Elevator State Machine
+![State Machine](./docs/state-machine-diagram.png)
+
 
 ### Implementations
 
