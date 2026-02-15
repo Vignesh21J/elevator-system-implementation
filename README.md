@@ -4,7 +4,8 @@
 
 ## Overview
 
-This project implements a real-world Elevator System using Java, focusing on Low-Level Design (LLD) principles.  
+This project simulates a real-world Elevator System using Java, designed with strong Object-Oriented Programming (OOP) principles and industry-standard design patterns to ensure scalability, maintainability, and clean architecture.
+
 It simulates elevator behavior step-by-step, handles hall and elevator requests, and supports pluggable scheduling algorithms using clean object-oriented design.
 
 This project is built incrementally to demonstrate Core Java, Collections, Design Patterns, and extensibility toward multithreading.
@@ -46,7 +47,7 @@ This project is built incrementally to demonstrate Core Java, Collections, Desig
 
 ---
 
-## High-Level Design
+## Design
 
 ### Core Components
 
@@ -78,7 +79,6 @@ ElevatorSystem (Facade)
 |------|------|
 | Facade | ElevatorSystem exposes clean APIs |
 | Strategy | Pluggable scheduling algorithms |
-| State | Elevator, door and fan states |
 | Single Responsibility | Clear ownership of logic |
 
 ---
@@ -287,11 +287,10 @@ Initial version is single-threaded by design.
 * Capacity constraints
 * VIP priority requests
 * Emergency modes
-* Zoning for low-rise / high-rise buildings
 * Multithreaded execution
 
 ---
 
 ## Author
 
-Built as a learning-oriented, interview-ready LLD project to demonstrate Java fundamentals, design patterns, and system thinking.
+Built as a learning-oriented, interview-ready system design project to demonstrate Java fundamentals, design patterns, and the practical implementation of a real-world elevator system.

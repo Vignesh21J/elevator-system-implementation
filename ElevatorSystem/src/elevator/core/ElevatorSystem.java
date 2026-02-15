@@ -46,7 +46,7 @@ public final class ElevatorSystem {
         validateHallDirection(floor, direction);
 
         HallRequest request = new HallRequest(floor, direction);
-        dispatcher.onHallRequest(request, elevators);
+        dispatcher.onHallRequest(request, getElevators());
     }
 
     // New Cabin Request for Drop off
