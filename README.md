@@ -1,6 +1,6 @@
 
 
-# Elevator System – Low Level Design (Java)
+# Elevator System – Design and Implementation (Java)
 
 ## Overview
 
